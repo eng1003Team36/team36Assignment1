@@ -42,6 +42,9 @@ freeze-button
         var smoothGZ = 0;        
         var alpha = 0.8;
 
+        var pitchBuffer = [0,0,0,0];
+
+
 // change test
 
 function SpiritLevelProcessor()
@@ -72,14 +75,13 @@ function SpiritLevelProcessor()
         //smoothGZ = gZ * alpha + (smoothGZ * (1.0 - alpha));
       
         var pitch = (Math.atan(-aY / aZ) * 180) / Math.PI;
-        var pitchBuffer = [0,0,0,0,0,0,0,0,0,0];
         var pitchAverage = movingAverage(pitchBuffer, pitch);
         
         var roll = (Math.atan(aX / Math.sqrt(Math.pow(aY,2) + Math.pow(aZ,2))) * 180) / Math.PI;
-        console.log("pitch: " + pitch + " roll: " + roll)
+        //console.log("pitch: " + pitch + " roll: " + roll)
 
-        
-        uiController.bubbleTranslate(roll,pitch, "dark-bubble");
+        console.log(pitchAverage);
+        uiController.bubbleTranslate(roll,pitchAverage, "dark-bubble");
 
 
         // This function handles the new incoming values from the accelerometer
@@ -98,7 +100,7 @@ function SpiritLevelProcessor()
         //      This function should return the result of the moving average filter
 
         // moving eery element in the array 1 space to the right
-        for(var i = 0; i<10; i++){
+        for(var i = 0; i<4; i++){
             buffer[i+1] = buffer[i];
         }
         
@@ -106,14 +108,16 @@ function SpiritLevelProcessor()
         buffer[0] = newValue;
         
         // cutting the array to 10 places
-        buffer = buffer.slice(0,10);
+        console.log(pitchBuffer);
+        pitchBuffer = buffer.slice(0,pitchBuffer.length);
         
         //finding the average
-        for(var i = 0; i<10; i++){
-            var sum = 0;
-            sum += buffer[i];
+        var sum = 0;
+        for(var i = 0; i<pitchBuffer.length; i++){
+            
+            sum += pitchBuffer[i];
         }
-        average = sum / buffer.length;
+        average = sum / pitchBuffer.length;
         
         // returning new average
         return average
