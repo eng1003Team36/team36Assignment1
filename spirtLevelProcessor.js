@@ -61,7 +61,7 @@ function SpiritLevelProcessor()
         var aX = event.accelerationIncludingGravity.x;
         var aY = event.accelerationIncludingGravity.y;
         var aZ = event.accelerationIncludingGravity.z;
-    
+        
         //var gX = aX / 9.8;
         //var gY = aY / 9.8;
         //var gZ = aZ / 9.8;
@@ -72,6 +72,9 @@ function SpiritLevelProcessor()
         //smoothGZ = gZ * alpha + (smoothGZ * (1.0 - alpha));
       
         var pitch = (Math.atan(-aY / aZ) * 180) / Math.PI;
+        var pitchBuffer = [0,0,0,0,0,0,0,0,0,0];
+        var pitchAverage = movingAverage(pitchBuffer, pitch);
+        
         var roll = (Math.atan(aX / Math.sqrt(Math.pow(aY,2) + Math.pow(aZ,2))) * 180) / Math.PI;
         console.log("pitch: " + pitch + " roll: " + roll)
 
@@ -84,8 +87,6 @@ function SpiritLevelProcessor()
 
     function movingAverage(buffer, newValue)
     {
-        // This function handles the Moving Average Filter
-
         // Input:
         //      buffer
         //      The buffer in which the function will apply the moving to.
@@ -93,8 +94,29 @@ function SpiritLevelProcessor()
         //      newValue
         //      This should be the newest value that will be pushed into the buffer
 
-        // Output: filteredValue
+        // Output: average
         //      This function should return the result of the moving average filter
+
+        // moving eery element in the array 1 space to the right
+        for(var i = 0; i<10; i++){
+            buffer[i+1] = buffer[i];
+        }
+        
+        // putting in newest value
+        buffer[0] = newValue;
+        
+        // cutting the array to 10 places
+        buffer = buffer.slice(0,10);
+        
+        //finding the average
+        for(var i = 0; i<10; i++){
+            var sum = 0;
+            sum += buffer[i];
+        }
+        average = sum / buffer.length;
+        
+        // returning new average
+        return average
     }
 
     function displayAngle(x,y,z)
