@@ -42,6 +42,8 @@ freeze-button
         var smoothGZ = 0;        
         var alpha = 0.8;
 
+// change test
+
 function SpiritLevelProcessor()
 {
     var self = this;
