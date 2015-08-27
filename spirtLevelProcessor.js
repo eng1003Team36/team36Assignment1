@@ -37,15 +37,11 @@ message-area
 freeze-button
     ID of the "Freeze" button
 ****************************************************************************************/
-        var smoothGX = 0;
-        var smoothGY = 0;
-        var smoothGZ = 0;        
-        var alpha = 0.8;
-
-        var pitchBuffer = [0,0,0,0];
 
 
-// change test
+// these two lines make an array of zeros to a certain length (I don't understand it)
+var pitchBuffer = Array.apply(null, Array(50)).map(Number.prototype.valueOf, 0);
+var rollBuffer = Array.apply(null, Array(50)).map(Number.prototype.valueOf, 0);
 
 function SpiritLevelProcessor()
 {
@@ -64,64 +60,38 @@ function SpiritLevelProcessor()
         var aX = event.accelerationIncludingGravity.x;
         var aY = event.accelerationIncludingGravity.y;
         var aZ = event.accelerationIncludingGravity.z;
-        
-        //var gX = aX / 9.8;
-        //var gY = aY / 9.8;
-        //var gZ = aZ / 9.8;
-        
-        //Low Pass Filter
-        //smoothGX = gX * alpha + (smoothGX * (1.0 - alpha));
-        //smoothGY = gY * alpha + (smoothGY * (1.0 - alpha));
-        //smoothGZ = gZ * alpha + (smoothGZ * (1.0 - alpha));
-      
+
         var pitch = (Math.atan(-aY / aZ) * 180) / Math.PI;
-        var pitchAverage = movingAverage(pitchBuffer, pitch);
+        var pitchAverage;
+        var pitchObject = movingAverage(pitchBuffer, pitch);
         
         var roll = (Math.atan(aX / Math.sqrt(Math.pow(aY,2) + Math.pow(aZ,2))) * 180) / Math.PI;
-        //console.log("pitch: " + pitch + " roll: " + roll)
+        var rollAverage;
+        var rollObject = movingAverage(rollBuffer, roll);
 
-        console.log(pitchAverage);
-        uiController.bubbleTranslate(roll,pitchAverage, "dark-bubble");
-
-
-        // This function handles the new incoming values from the accelerometer
+        var motion = uiController.bubbleTranslate(rollObject.average,pitchObject.average, "dark-bubble");
     }
 
-    function movingAverage(buffer, newValue)
-    {
-        // Input:
-        //      buffer
-        //      The buffer in which the function will apply the moving to.
+        function movingAverage(buffer, newValue)
+        {
+            var temp = buffer;
+            for(var i = 0; i<buffer.length; i++){
+                temp[i+1] = buffer[i];
+            }
+            temp[0] = newValue;
 
-        //      newValue
-        //      This should be the newest value that will be pushed into the buffer
+            //console.log(pitchBuffer);
+            buffer = temp.slice(0, buffer.length);
 
-        // Output: average
-        //      This function should return the result of the moving average filter
+            var sum = 0;
+            for(var i = 0; i<buffer.length; i++){
 
-        // moving eery element in the array 1 space to the right
-        for(var i = 0; i<4; i++){
-            buffer[i+1] = buffer[i];
+                sum += buffer[i];
+            }
+            var average = sum / buffer.length;
+
+                return {average : average, buffer : buffer};
         }
-        
-        // putting in newest value
-        buffer[0] = newValue;
-        
-        // cutting the array to 10 places
-        console.log(pitchBuffer);
-        pitchBuffer = buffer.slice(0,pitchBuffer.length);
-        
-        //finding the average
-        var sum = 0;
-        for(var i = 0; i<pitchBuffer.length; i++){
-            
-            sum += pitchBuffer[i];
-        }
-        average = sum / pitchBuffer.length;
-        
-        // returning new average
-        return average
-    }
 
     function displayAngle(x,y,z)
     {
