@@ -77,7 +77,7 @@ function SpiritLevelProcessor() {
         var target = document.getElementById("message-area");
         var xDisplay = Math.round(rollAverage);
         var yDisplay = Math.round(-1*pitchAverage);
-        var zDisplay = 0; // what is the calculation here?
+        var zDisplay = Math.round(Math.pow(Math.pow(rollAverage,2) + Math.pow(pitchAverage,2),1/2));
         target.innerHTML = displayAngle(xDisplay, yDisplay, zDisplay);
         
         //moving and freezing the pale bubble when freeze button is pressed
