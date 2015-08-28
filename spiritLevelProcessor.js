@@ -54,6 +54,8 @@ function SpiritLevelProcessor() {
     };
     
     function handleMotion(event) {
+        
+        //getting the accelerometer data
         var aX = event.accelerationIncludingGravity.x;
         var aY = event.accelerationIncludingGravity.y;
         var aZ = event.accelerationIncludingGravity.z;
@@ -67,18 +69,25 @@ function SpiritLevelProcessor() {
         var rollAverage = movingAverage(rollBuffer);
         var pitchAverage = movingAverage(pitchBuffer);
         
+        //moving the bubble
         uiController.bubbleTranslate(rollAverage * 2, pitchAverage * 2, "dark-bubble");
         
-        var target = document.getElementById("message-area");
         
+        // displaying angle
+        var target = document.getElementById("message-area");
         var xDisplay = Math.round(rollAverage);
         var yDisplay = Math.round(-1*pitchAverage);
         var zDisplay = 0; // what is the calculation here?
         target.innerHTML = displayAngle(xDisplay, yDisplay, zDisplay);
         
+        //moving and freezing the pale bubble when freeze button is pressed
+        self.freezeClick = function() {
+        uiController.bubbleTranslate(rollAverage * 2, pitchAverage * 2, "pale-bubble");
+        }
     }
-
+    
     function newBuffer(buffer, newValue) {
+        //moves all data one spot forward and puts the new value in the back
         for (var i = 1; i<buffer.length; i++) {
         var temp = buffer;
 
@@ -91,6 +100,7 @@ function SpiritLevelProcessor() {
     }
     
     function movingAverage(buffer) {
+        //takes the average of the input array
         var sum = 0;
         for (var i = 0; i<buffer.length; i++) {
             sum += buffer[i];
@@ -99,33 +109,12 @@ function SpiritLevelProcessor() {
         return average;
     }
 
-    function displayAngle(x,y,z)
-    {
-        /*var aX = event.accelerationIncludingGravity.x;
-        var aY = event.accelerationIncludingGravity.y;
-        var aZ = event.accelerationIncludingGravity.z;*/
-        
-        // This function will handle the calculation of the angle from the z-axis and
-        // display it on the screen inside a "div" tag with the id of "message-area"
-
-        // Input: x,y,z
-        //      These values should be the filtered values after the Moving Average for
-        //      each of the axes respectively
-        //here is a comment
-
-        
-
+    function displayAngle(x,y,z) {
+        //creates a display string
         var displayString = "x: " + x + " y: " + y + " z: " + z;
         return displayString;
     }
 
-    self.freezeClick = function()
-    {
-        // ADVANCED FUNCTIONALITY
-        // ================================================================
-        // This function will trigger when the "Freeze" button is pressed
-        // The ID of the button is "freeze-button"
-    }
 
     function movingMedian(buffer, newValue)
     {
