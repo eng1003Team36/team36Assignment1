@@ -111,7 +111,8 @@ function SpiritLevelProcessor() {
         // Input: x,y,z
         //      These values should be the filtered values after the Moving Average for
         //      each of the axes respectively
-        
+        //here is a comment
+
         var displayString = "x: " + x + " y: " + y + " z: " + z;
         return displayString;
     }
