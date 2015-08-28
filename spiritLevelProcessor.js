@@ -40,17 +40,25 @@ freeze-button
 
 
 function SpiritLevelProcessor() {
+
+    //initialising the buffers
+    var bufferLength = 25;
+    var pitchBuffer = Array.apply(null, Array(bufferLength)).map(Number.prototype.valueOf, 0);
+    var rollBuffer = Array.apply(null, Array(bufferLength)).map(Number.prototype.valueOf, 0);
     
-    // these two lines make an array of zeros to a certain length (I don't understand it)
-    var pitchBuffer = Array.apply(null, Array(25)).map(Number.prototype.valueOf, 0);
-    var rollBuffer = Array.apply(null, Array(25)).map(Number.prototype.valueOf, 0);
+    //making the bubble stop at the edges of the screen
+    var screenWidth = document.body.clientWidth;
+    var screenHeight = document.body.clientHeight;
+    var widthLimit = 30;
+    var heightLimit = widthLimit*screenHeight/screenWidth;
+    var rollLimitFactor = screenWidth/widthLimit/2;
+    var pitchLimitFactor = screenHeight/heightLimit/2;
     
     var self = this, uiController = null;
-
+    
     self.initialise = function (controller) {
-    uiController = controller;
-        
-    window.addEventListener("devicemotion", handleMotion);
+        uiController = controller;
+        window.addEventListener("devicemotion", handleMotion);
     };
     
     function handleMotion(event) {
@@ -60,30 +68,39 @@ function SpiritLevelProcessor() {
         var aY = event.accelerationIncludingGravity.y;
         var aZ = event.accelerationIncludingGravity.z;
         
-        var pitch = (Math.atan(-aY / aZ) * 180) / Math.PI;
-        var roll = (Math.atan(aX / Math.sqrt(Math.pow(aY, 2) + Math.pow(aZ, 2))) * 180) / Math.PI;
+        var pitch = (Math.atan(-aY / aZ) * 180) / Math.PI; //y axis
+        if(pitch > heightLimit)
+            pitch = heightLimit;
+        else if (pitch < -heightLimit)
+            pitch = -heightLimit
+        
+        var roll = (Math.atan(aX / Math.sqrt(Math.pow(aY, 2) + Math.pow(aZ, 2))) * 180) / Math.PI; //x axis
+        if (roll > widthLimit)
+            roll = widthLimit;
+        else if (roll < -widthLimit)
+            roll = -widthLimit
         
         rollBuffer = newBuffer(rollBuffer, roll);
         pitchBuffer = newBuffer(pitchBuffer, pitch);
         
-        var rollAverage = movingAverage(rollBuffer);
-        var pitchAverage = movingAverage(pitchBuffer);
+        //taking average or median
+        var smoothRoll = movingAverage(rollBuffer), smoothPitch = movingAverage(pitchBuffer);
+        //var smoothRoll = movingMedian(rollBuffer), smoothPitch = movingMedian(pitchBuffer);
         
         //moving the bubble
-        uiController.bubbleTranslate(rollAverage * 2, pitchAverage * 2, "dark-bubble");
+        uiController.bubbleTranslate(smoothRoll * rollLimitFactor, smoothPitch * pitchLimitFactor, "dark-bubble");
         
-        
-        // displaying angle
-        var target = document.getElementById("message-area");
-        var xDisplay = Math.round(rollAverage);
-        var yDisplay = Math.round(-1*pitchAverage);
-        var zDisplay = Math.round(Math.pow(Math.pow(rollAverage,2) + Math.pow(pitchAverage,2),1/2));
-        target.innerHTML = displayAngle(xDisplay, yDisplay, zDisplay);
-        
-        //moving and freezing the pale bubble when freeze button is pressed
+        //freeze button
         self.freezeClick = function() {
-        uiController.bubbleTranslate(rollAverage * 2, pitchAverage * 2, "pale-bubble");
+        uiController.bubbleTranslate(smoothRoll * rollLimitFactor, smoothPitch * pitchLimitFactor, "pale-bubble");
         }
+        
+        //displaying angle
+        var target = document.getElementById("message-area");
+        var xRound = Math.round(smoothRoll);
+        var yRound = Math.round(-smoothPitch);
+        var zRound = Math.round(Math.pow(Math.pow(smoothRoll, 2) + Math.pow(smoothPitch, 2), 1/2));
+        target.innerHTML = displayAngle(xRound, yRound, zRound);
     }
     
     function newBuffer(buffer, newValue) {
@@ -109,26 +126,15 @@ function SpiritLevelProcessor() {
         return average;
     }
 
+    function movingMedian(buffer) {
+        //takes the median of the input array
+        var median = buffer[Math.round(buffer.length/2)];
+        return median;
+    }
+    
     function displayAngle(x,y,z) {
         //creates a display string
         var displayString = "x: " + x + " y: " + y + " z: " + z;
         return displayString;
-    }
-
-
-    function movingMedian(buffer, newValue)
-    {
-      // ADVANCED FUNCTIONALITY
-      // =================================================================
-      // This function handles the Moving Median Filter
-      // Input:
-      //      buffer
-      //      The buffer in which the function will apply the moving to.
-
-      //      newValue
-      //      This should be the newest value that will be pushed into the buffer
-
-      // Output: filteredValue
-      //      This function should return the result of the moving average filter
     }
 }
