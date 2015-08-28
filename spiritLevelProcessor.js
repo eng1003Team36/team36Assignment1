@@ -49,7 +49,7 @@ function SpiritLevelProcessor() {
     //making the bubble stop at the edges of the screen
     var screenWidth = document.body.clientWidth;
     var screenHeight = document.body.clientHeight;
-    var widthLimit = 30;
+    var widthLimit = 30; //this is the angle it stops at
     var heightLimit = widthLimit*screenHeight/screenWidth;
     var rollLimitFactor = screenWidth/widthLimit/2;
     var pitchLimitFactor = screenHeight/heightLimit/2;
