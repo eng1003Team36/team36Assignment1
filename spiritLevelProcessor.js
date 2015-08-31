@@ -84,8 +84,8 @@ function SpiritLevelProcessor() {
         pitchBuffer = newBuffer(pitchBuffer, pitch);
         
         //taking average or median
-        var smoothRoll = movingAverage(rollBuffer), smoothPitch = movingAverage(pitchBuffer);
-        //var smoothRoll = movingMedian(rollBuffer), smoothPitch = movingMedian(pitchBuffer);
+        //var smoothRoll = movingAverage(rollBuffer), smoothPitch = movingAverage(pitchBuffer);
+        var smoothRoll = movingMedian(rollBuffer), smoothPitch = movingMedian(pitchBuffer);
         
         //moving the bubble
         uiController.bubbleTranslate(smoothRoll * rollLimitFactor, smoothPitch * pitchLimitFactor, "dark-bubble");
@@ -128,7 +128,12 @@ function SpiritLevelProcessor() {
 
     function movingMedian(buffer) {
         //takes the median of the input array
+        //var median = 
+        
+        var sortedBuffer = buffer.sort();
         var median = buffer[Math.round(buffer.length/2)];
+        console.log(median);
+        
         return median;
     }
     
