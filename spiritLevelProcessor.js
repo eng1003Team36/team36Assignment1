@@ -114,8 +114,23 @@ function SpiritLevelProcessor() {
         buffer = temp;
 
         return buffer;
-    }
     
+    
+    /*
+    investigate using .splace() and .push() methods
+    
+    var a = [1,2,3,4,5];
+    if (a.length<5){
+    a.push(value);
+    }
+    else{
+        a.splace(0.1);
+        a.push(vaue)}
+    
+    */
+    
+    }
+        
     function movingAverage(buffer) {
         //takes the average of the input array
         var sum = 0;
