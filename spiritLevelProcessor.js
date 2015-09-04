@@ -84,8 +84,14 @@ function SpiritLevelProcessor() {
         pitchBuffer = newBuffer(pitchBuffer, pitch);
         
         //taking average or median
-        //var smoothRoll = movingAverage(rollBuffer), smoothPitch = movingAverage(pitchBuffer);
-        var smoothRoll = movingMedian(rollBuffer), smoothPitch = movingMedian(pitchBuffer);
+
+        //var smoothRoll = movingAverage(rollBuffer);
+        //var smoothPitch = movingAverage(pitchBuffer);
+        console.log(rollBuffer);
+        var smoothRoll = movingMedian(rollBuffer); 
+        var smoothPitch = movingMedian(pitchBuffer);
+
+        
         
         //moving the bubble
         uiController.bubbleTranslate(smoothRoll * rollLimitFactor, smoothPitch * pitchLimitFactor, "dark-bubble");
@@ -106,10 +112,10 @@ function SpiritLevelProcessor() {
     function newBuffer(buffer, newValue) {
         //moves all data one spot forward and puts the new value in the back
         for (var i = 1; i<buffer.length; i++) {
-        var temp = buffer;
-
-        temp[i-1] = buffer[i];
+            var temp = buffer;
+            temp[i-1] = buffer[i];
         }
+        
         temp[buffer.length-1] = newValue;
         buffer = temp;
 
@@ -117,23 +123,31 @@ function SpiritLevelProcessor() {
     }
     
     function movingAverage(buffer) {
+ 
         //takes the average of the input array
         var sum = 0;
         for (var i = 0; i<buffer.length; i++) {
             sum += buffer[i];
         }
         var average = sum / buffer.length;
+
         return average;
     }
+    
+        
+    function sortArray(a,b) {
+            return a-b;   
+     }
 
     function movingMedian(buffer) {
         //takes the median of the input array
-        //var median = 
         
-        var sortedBuffer = buffer.sort();
-        var median = buffer[Math.round(buffer.length/2)];
-        console.log(median);
+        var median=0, sortedArray = [];
+        var clonedArray = buffer.slice(0);
         
+        sortedArray = clonedArray.sort(sortArray);
+        median = sortedArray[Math.round(sortedArray.length/2)];
+                
         return median;
     }
     
