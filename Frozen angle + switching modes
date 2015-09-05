@@ -30,8 +30,9 @@ freeze-button
     ID of the "Freeze" button
 ****************************************************************************************/
 
-var changeToMedian = confirm("Run in moving median mode?"); //Prompts the user to choose between median/average
-var frozenAngle = ""; //initialises Frozen Angle to an empty string
+var changeToMedian = confirm("Run in moving median mode?");
+var frozenAngle = ""
+var alignment = ""
 
 function SpiritLevelProcessor() {
 
@@ -78,7 +79,7 @@ function SpiritLevelProcessor() {
         pitchBuffer = newBuffer(pitchBuffer, pitch);
         
         //taking average or median
-		if (changeToMedian == true){  //selects average or median based on user decision at page load
+		if (changeToMedian == true){
         	var smoothRoll = movingMedian(rollBuffer), smoothPitch = movingMedian(pitchBuffer);
 		}
 		
@@ -95,7 +96,7 @@ function SpiritLevelProcessor() {
         var xRound = Math.round(smoothRoll);
         var yRound = Math.round(-smoothPitch);
         var zRound = Math.round(Math.pow(Math.pow(smoothRoll, 2) + Math.pow(smoothPitch, 2), 1/2));
-        target.innerHTML = displayAngle(xRound, yRound, zRound) + "<br/>" + "Frozen Angle: " + frozenAngle;
+        target.innerHTML = displayAngle(xRound, yRound, zRound) + "<br/>" + "Frozen Angle: " + frozenAngle + "<br/>" + alignment;
 		       
 		//freeze button
         self.freezeClick = function() {
@@ -103,9 +104,16 @@ function SpiritLevelProcessor() {
 		//var xRoundSaved = Math.round(smoothRoll);
         //var yRoundSaved = Math.round(-smoothPitch);
         //var zRoundSaved = Math.round(Math.pow(Math.pow(smoothRoll, 2) + Math.pow(smoothPitch, 2), 1/2));
-		frozenAngle = Math.round(Math.pow(Math.pow(smoothRoll, 2) + Math.pow(smoothPitch, 2), 1/2)); //captures the frozen angle
+		frozenAngle = Math.round(Math.pow(Math.pow(smoothRoll, 2) + Math.pow(smoothPitch, 2), 1/2));
 
         }
+		
+		if (zRound === frozenAngle){
+			alignment = "Aligned!"
+		}
+		else{
+			alignment = ""
+		}
 	
     }
     
@@ -132,9 +140,20 @@ function SpiritLevelProcessor() {
         return average;
     }
 
+     
+    function sortArray(a,b) {
+            return a-b;   
+     }
+
     function movingMedian(buffer) {
         //takes the median of the input array
-        var median = buffer[Math.round(buffer.length/2)];
+        
+        var median=0, sortedArray = [];
+        var clonedArray = buffer.slice(0);
+        
+        sortedArray = clonedArray.sort(sortArray);
+        median = sortedArray[Math.round(sortedArray.length/2)];
+                
         return median;
     }
     
